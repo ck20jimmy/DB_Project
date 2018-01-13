@@ -1,52 +1,44 @@
 from django.db import models
-from django.contrib.auth.models import (
-    BaseUserManager, AbstractBaseUser
-)
-# Create your models here.
-class AccountManager(BaseUserManager):
-    
-    def create_user(self, email, name, password=None):
-    
-        if not email:
-            raise ValueError('Missing Required Field: Email')
-        user = self.model(
-            email = self.normalized_email(email),
-            name = name
-        )
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-    
-    def create_superuser(self, email, name, password):
-        
-        user = self.create_user(email, name = name, password=password)
-        user.is_admin = True
-        user.save(using=self._db)
-        return user
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+class Personnel(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, editable=False)
+    email = models.EmailField()
+    name = models.CharField(max_length=50)
+class Accounts(models.Model):
+    personnel_ID = models.ForeignKey('Personnel',on_delete=models.SET_DEFAULT,default="Out-of-management")
+    username = models.CharField(max_length=50, primary_key=True)
+    privilege = models.CharField(max_length=50)
+    machine = models.CharField(max_length=50, primary_key=True)
+    password = models.CharField(max_length=50)
+class Access_to_server(models.Model):
+    username = models.ForeignKey('Personnel', on_delete=models.CASCADE, primary_key=True)
+    server_ID = models.ForeignKey('Servers', on_delete=models.CASCADE, primary_key=True)
+class Access_to_service(models.Model):
+    username = models.ForeignKey('Personnel', on_delete=models.CASCADE, primary_key=True)
+    service_ID = models.ForeignKey('Services', on_delete=models.CASCADE, primary_key=True)
+class Access_to_switches(models.Model):
+    username = models.ForeignKey('Personnel', on_delete=models.CASCADE, primary_key=True)
+    switches_ID = models.ForeignKey('Switches', on_delete=models.CASCADE, primary_key=True)
 
 
 
-class Account(AbstractBaseUser):
-    
-    email = models.EmailField(primary_key=True)
-    name = models.CharField(max_length=40)
-    is_admin = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    USERNAME_FIELD = 'email'
-    EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['name']
+class Servers(models.Model):
+    ip = models.CharField(max_length=15)
+class Services(models.Model):
+    server_ID = models.ForeignKey('Servers', on_delete=models.CASCADE)
+class Switches(models.Model):
+    ip = models.CharField(max_length=15)
 
-    objects = AccountManager()
-    
-    #With default privileges, must be modified before use.
-    def __str__(self):
-        return self.email
+                                
 
-    def has_perm(self, perm, obj=None):
-        return True
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Account.objects.create(user=instance)
 
-    def has_module_perms(self, app_label):
-        return True
-    @property
-    def is_staff(self):
-        return self.is_admin
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+        instance.account.save()
+
