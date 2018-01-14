@@ -35,7 +35,7 @@ class Switch_account(models.Model):
     switch_id = models.ForeignKey('Switch', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
     def __str__(self):
-        return str(self.username) + '@' + str(self.switch_id)
+        return self.username + '@' + self.switch_id
 
 class Server(models.Model):
     slot_num = models.IntegerField(null=True)
@@ -60,6 +60,7 @@ class Interface(models.Model):
     hostname = models.CharField(max_length=100, null=True)
     server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
     port_id = models.ForeignKey('Port', on_delete=models.CASCADE)
+    service_id = models.ForeignKey('Service', on_delete=models.CASCADE)
 
 class Port(models.Model):
     switch_port_id = models.IntegerField(null=True)
