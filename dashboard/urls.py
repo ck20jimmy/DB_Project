@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^auth/$', views.LoginView.as_view(), name="login"),
     url(r'^service/$', login_required(views.ServiceView.as_view(template_name="components/service_tables.html")), name="service"), 
     url(r'^switch/$', login_required(views.SwitchView.as_view(template_name="components/switch_tables.html")), name="switch"),
+    url(r'^server/$', login_required(views.ServerView.as_view(template_name="components/server_tables.html")), name="server"), 
     url(r'^interface/$', login_required(views.InterfaceView.as_view(template_name="components/interface_tables.html")), name="interface"),
     url(r'^$', login_required(views.IndexView.as_view(template_name="components/index.html")), name="index"),
     url(r'^logout/$', views.LogoutView.as_view(), name="logout"),
