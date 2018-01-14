@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView, RedirectView
 from django.contrib.auth.decorators import login_required
+from dashboard.models import *
 
 class IndexView(TemplateView):
     template_name = "components/index.html"
@@ -133,3 +134,14 @@ class LogoutView(RedirectView):
     def get(self, request, *args, **kwargs):
         auth_logout(request)
         return super(LogoutView, self).get(request, *args, **kwargs)
+
+class ServerView(TemplateView):
+	template_name = "components/server_tables.html"
+	def get_context_data(self, **kwargs):
+		context = super(ServerView, self).get_context_data(**kwargs)
+		context.update({'title': "Server Information"})
+		context['server_fields'] = [ f.name for f in Server._meta.get_fields(include_hidden=False) ]
+		context['servers'] = Server.objects.all()
+		return context
+
+

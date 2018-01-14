@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [
     url(r'^auth/$', views.LoginView.as_view(), name="login"),
+    url(r'^server/$', login_required(views.ServerView.as_view(template_name="components/server_tables.html")), name="server"),
     url(r'^$', login_required(TemplateView.as_view(template_name="components/index.html"))),
     url(r'^blank/$', login_required(TemplateView.as_view(template_name="components/blank.html"))),
     url(r'^buttons/$', login_required(TemplateView.as_view(template_name="components/buttons.html"))),

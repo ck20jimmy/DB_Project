@@ -25,8 +25,8 @@ class Server_account(models.Model):
     privilege = models.CharField(max_length=50, null=True)
     server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
-    def __str__(self):
-        return self.username + '@' + self.server_id
+    #def __str__(self):
+        #return self.username + '@' + self.server_id
 
 class Switch_account(models.Model):
     personnel_id = models.ForeignKey('Personnel',on_delete=models.SET_NULL, null=True)  
@@ -34,8 +34,8 @@ class Switch_account(models.Model):
     privilege = models.CharField(max_length=50, null=True)
     switch_id = models.ForeignKey('Switch', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
-    def __str__(self):
-        return self.username + '@' + self.switch_id
+    #def __str__(self):
+        #return self.username + '@' + self.switch_id
 
 class Server(models.Model):
     slot_num = models.IntegerField(null=True)
