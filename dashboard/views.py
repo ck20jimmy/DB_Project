@@ -7,21 +7,14 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import FormView, RedirectView
+from .models import *
 from django.contrib.auth.decorators import login_required
-from dashboard.models import *
 
 class IndexView(TemplateView):
     template_name = "components/index.html"
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
         context.update({'title': "Dashboard"})
-        return context
-
-class BlankView(TemplateView):
-    template_name = "components/blank.html"
-    def get_context_data(self, **kwargs):
-        context = super(BlankView, self).get_context_data(**kwargs)
-        context.update({'title': "Blank Page"})
         return context
 
 class ButtonsView(TemplateView):
@@ -59,7 +52,6 @@ class IconsView(TemplateView):
         context.update({'title': "Icons"})
         return context
 
-
 class LoginView(FormView):
     template_name = "components/login.html"
     success_url = "/"
@@ -91,8 +83,6 @@ class LoginView(FormView):
         context = super(LoginView, self).get_context_data(**kwargs)
         context.update({'title': "Log In"})
         return context
-
-                                                                    
 
 class MorrisView(TemplateView):
     template_name = "components/morris.html"
@@ -129,12 +119,71 @@ class TypographyView(TemplateView):
         context.update({'title': "Typography"})
         return context
 
+class SwitchView(TemplateView):
+    template_name = "components/switch_tables.html"
+
+    def get_context_data(self,**kwargs):
+        context = super(SwitchView, self).get_context_data(**kwargs)
+        context.update({'title': "Switch Tables"})
+        context['switch_fields'] = [ f.name for f in Switch._meta.fields]
+        switches = Switch.objects.all()
+
+        used_ports = []
+        account_on_switches = []
+
+        for switch in switches:
+            allports = Port.objects.filter(switch_id=switch.id)
+            used_port = []
+            for port in allports:
+                if Interface.objects.filter(port_id=port.id):
+                    used_port.append(port.switch_port_id) 
+
+            used_ports.append(used_port)
+
+            switch_accounts = Switch_account.objects.filter(switch_id=switch.id)
+            account_on_switches.append([ account.username for account in switch_accounts ])
+
+        context['switches_data'] = zip(switches,used_ports,account_on_switches)
+
+        return context
+
+class ServiceView(TemplateView):
+    template_name = "components/service_tables.html"
+
+    def get_context_data(self,**kwargs):
+        context = super(ServiceView, self).get_context_data(**kwargs)
+        context.update({'title': "Service Tables"})
+        context['service_fields'] = [ f.name for f in Service._meta.fields]
+        services = Service.objects.all()
+
+        account_on_services = []
+
+        for service in services:
+            accounts = Access_to_service.objects.filter(service_id=service.id)
+            account_on_services.append([ account.username for account in accounts ])
+
+        context['services_data'] = zip(services,account_on_services)
+        print(context)
+        return context
+
+
+class InterfaceView(TemplateView):
+    template_name = "components/interface_tables.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(InterfaceView, self).get_context_data(**kwargs)
+        context.update({'title': "Interface Tables"})
+        
+
+
+        return context
+
 class LogoutView(RedirectView):
     url = '/auth/'
     def get(self, request, *args, **kwargs):
         auth_logout(request)
         return super(LogoutView, self).get(request, *args, **kwargs)
-
+      
 class ServerView(TemplateView):
 	template_name = "components/server_tables.html"
 	def get_context_data(self, **kwargs):
@@ -152,5 +201,3 @@ class ServerView(TemplateView):
 			interfaces_in_server.append(Interface.objects.filter(server_id=i.id))
 		context['servers'] = zip(Server.objects.all(), services_in_server, accounts_in_server, interfaces_in_server)
 		return context
-
-
