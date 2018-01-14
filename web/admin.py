@@ -6,5 +6,5 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 from web.models import *
 
-admin.site.register((Account,Personnel),)
+admin.site.register((Server_account, Switch_account, Personnel, Server, Service, Switch, Interface, Port, Access_to_server, Access_to_service, Access_to_switch, Vlan_to_interface),)
 admin.site.unregister(Group)
