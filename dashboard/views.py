@@ -141,7 +141,16 @@ class ServerView(TemplateView):
 		context = super(ServerView, self).get_context_data(**kwargs)
 		context.update({'title': "Server Information"})
 		context['server_fields'] = [ f.name for f in Server._meta.get_fields(include_hidden=False) ]
-		context['servers'] = Server.objects.all()
+		services_in_server = []
+		for i in Server.objects.all():
+			services_in_server.append(Service.objects.filter(server_id=i.id))
+		accounts_in_server = []
+		for i in Server.objects.all():
+			accounts_in_server.append(Server_account.objects.filter(server_id=i.id))
+		interfaces_in_server = []
+		for i in Server.objects.all():
+			interfaces_in_server.append(Interface.objects.filter(server_id=i.id))
+		context['servers'] = zip(Server.objects.all(), services_in_server, accounts_in_server, interfaces_in_server)
 		return context
 
 

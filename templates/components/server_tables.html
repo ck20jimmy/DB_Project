@@ -22,17 +22,48 @@
 </div>
 
 <div class="row">
-	{% for s in servers %}
+	{% for server, services_in_server, accounts_in_server, interfaces_in_server in servers %}
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-				<table>
-                {{s.id}}
+				<td> {{ server.brand_and_model }} </td>
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover">
-
+						<tr> 
+							<td> {{ server.slot_num }} </td>
+						</tr>
+						<tr>
+							<td> {{ server.cabinet_num }} </td>
+						</tr>						
+						<tr>
+							<td> {{ server.spec }} </td>
+						</tr>
+						<tr>
+							<td> {{ server.brand_and_model }} </td>
+						</tr>
+						<tr>
+							<td>
+							{% for service in services_in_server %}
+								{{ service.name }} 
+							{% endfor %}
+							</td>
+						</tr>
+						<tr>
+							<td>
+							{% for account in accounts_in_server %}
+								{{ account.username }} 
+							{% endfor %}
+							</td>
+						</tr>
+						<tr>
+							<td>
+							{% for interface in interfaces_in_server %}
+								{{ interface.ip }} 
+							{% endfor %}
+							</td>
+						</tr>
                     </table>
                 </div>
             </div>
