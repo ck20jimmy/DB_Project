@@ -159,7 +159,7 @@ class ServiceView(TemplateView):
         account_on_services = []
 
         for service in services:
-            accounts = Access_to_service.objects.filter(service_id=service.id)
+            accounts = Access_to_service.objects.filter(service_name__name=service.name)
             account_on_services.append([ account.username for account in accounts ])
 
         context['services_data'] = zip(services,account_on_services)

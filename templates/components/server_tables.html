@@ -26,23 +26,23 @@
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-				<td> {{ server.name }} </td>
+				<td> <b>{{ server.name }}</b> </td>
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered table-hover">
                         <tr> 
-							<td> Slot Number: {{ server.slot_num }} </td>
+							<td> <b>Slot Number: </b> {{ server.slot_num }} </td>
 						</tr>
 						<tr>
-							<td> Cabinet Number: {{ server.cabinet_num }} </td>
+							<td> <b>Cabinet Number: </b> {{ server.cabinet_num }} </td>
 						</tr>						
 						<tr>
-							<td> Spec: {{ server.spec }} </td>
+							<td> <b>Spec:</b> {{ server.spec }} </td>
 						</tr>
 						<tr>
 							<td>
-							Services:
+							<b>Services:</b>
 							{% for service in services_in_server %}
 								{{ service.name }} 
 							{% endfor %}
@@ -50,7 +50,7 @@
 						</tr>
 						<tr>
 							<td>
-							Accounts:
+							<b>Accounts:</b>
 							{% for account in accounts_in_server %}
 								{{ account.username }} 
 							{% endfor %}
@@ -58,7 +58,7 @@
 						</tr>
 						<tr>
 							<td>
-							Interfaces:
+							<b>Interfaces: </b>
 							{% for interface in interfaces_in_server %}
 								{{ interface.name }}({{interface.ip }})
 							{% endfor %}
