@@ -23,7 +23,7 @@ class Server_account(models.Model):
     personnel_id = models.ForeignKey('Personnel', on_delete=models.SET_NULL, null=True)  
     username = models.CharField(max_length=50, null=True)
     privilege = models.CharField(max_length=50, null=True)
-    server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
+    server_name = models.ForeignKey('Server', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
     #def __str__(self):
         #return self.username + '@' + self.server_id
@@ -32,22 +32,26 @@ class Switch_account(models.Model):
     personnel_id = models.ForeignKey('Personnel',on_delete=models.SET_NULL, null=True)  
     username = models.CharField(max_length=50, null=True)
     privilege = models.CharField(max_length=50, null=True)
-    switch_id = models.ForeignKey('Switch', on_delete=models.CASCADE)
+    switch_name = models.ForeignKey('Switch', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
     #def __str__(self):
         #return str(self.username) + '@' + str(self.switch_id)
 
 class Server(models.Model):
+    name = models.CharField(max_length=100)
     slot_num = models.IntegerField(null=True)
     cabinet_num = models.IntegerField(null=True)
     spec = models.CharField(max_length=300, null=True)
-    brand_and_model = models.CharField(max_length=100, null=True)
+    def __str__(self):
+        return self.name
 
 class Service(models.Model):
     name = models.CharField(max_length=50, null=True)
-    server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
-    port_id = models.IntegerField(null=True)
-    interface_id = models.ForeignKey('Interface', on_delete=models.CASCADE)
+    server_name = models.ForeignKey('Server', on_delete=models.CASCADE, null=True, blank=True)
+    port = models.IntegerField(null=True)
+    interface_id = models.ForeignKey('Interface', on_delete=models.CASCADE, null=True, blank=True)
+    def __str__(self):
+        return '{} {}'.format(self.name, self.server_name)
 
 class Switch(models.Model):
     ip = models.CharField(max_length=20, null=True)
