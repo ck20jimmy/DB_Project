@@ -132,15 +132,15 @@ class SwitchView(TemplateView):
         account_on_switches = []
 
         for switch in switches:
-            allports = Port.objects.filter(switch_id=switch.id)
+            allports = Port.objects.filter(switch_name__name=switch.name)
             used_port = []
             for port in allports:
-                if Interface.objects.filter(port_id=port.id):
+                if Interface.objects.filter(switch_port__switch_port_id=port.switch_port_id).filter(switch_port__switch_name=port.switch_name):
                     used_port.append(port.switch_port_id) 
 
             used_ports.append(used_port)
 
-            switch_accounts = Switch_account.objects.filter(switch_id=switch.id)
+            switch_accounts = Switch_account.objects.filter(switch_name__name=switch.name)
             account_on_switches.append([ account.username for account in switch_accounts ])
 
         context['switches_data'] = zip(switches,used_ports,account_on_switches)
