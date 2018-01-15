@@ -173,9 +173,6 @@ class InterfaceView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(InterfaceView, self).get_context_data(**kwargs)
         context.update({'title': "Interface Tables"})
-        
-
-
         return context
 
 class LogoutView(RedirectView):
@@ -185,19 +182,20 @@ class LogoutView(RedirectView):
         return super(LogoutView, self).get(request, *args, **kwargs)
       
 class ServerView(TemplateView):
-	template_name = "components/server_tables.html"
-	def get_context_data(self, **kwargs):
-		context = super(ServerView, self).get_context_data(**kwargs)
-		context.update({'title': "Server Information"})
-		context['server_fields'] = [ f.name for f in Server._meta.get_fields(include_hidden=False) ]
-		services_in_server = []
-		for i in Server.objects.all():
-			services_in_server.append(Service.objects.filter(server_id=i.id))
-		accounts_in_server = []
-		for i in Server.objects.all():
-			accounts_in_server.append(Server_account.objects.filter(server_id=i.id))
-		interfaces_in_server = []
-		for i in Server.objects.all():
-			interfaces_in_server.append(Interface.objects.filter(server_id=i.id))
-		context['servers'] = zip(Server.objects.all(), services_in_server, accounts_in_server, interfaces_in_server)
-		return context
+    template_name = "components/server_tables.html"
+    def get_context_data(self, **kwargs):
+        context = super(ServerView, self).get_context_data(**kwargs)
+        context.update({'title': "Server Information"})
+
+        #context['server_fields'] = [ f.name for f in Server._meta.get_fields(include_hidden=False) ]
+        services_in_server = []
+        for i in Server.objects.all():
+            services_in_server.append(Service.objects.filter(server_name__name=i.name))
+        accounts_in_server = []
+        for i in Server.objects.all():
+            accounts_in_server.append(Server_account.objects.filter(server_name__name=i.name))
+        interfaces_in_server = []
+        for i in Server.objects.all():
+            interfaces_in_server.append(Interface.objects.filter(server_name__name=i.name))
+        context['servers'] = zip(Server.objects.all(), services_in_server, accounts_in_server, interfaces_in_server)
+        return context
