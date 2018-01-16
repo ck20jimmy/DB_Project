@@ -3,11 +3,11 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 class Personnel(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, editable=False, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, editable=False)
     email = models.EmailField()
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, null=True)
     def __str__(self):
-        return self.name
+        return '%s (%s)' % (self.name, self.email)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -23,68 +23,69 @@ class Server_account(models.Model):
     personnel_id = models.ForeignKey('Personnel', on_delete=models.SET_NULL, null=True)  
     username = models.CharField(max_length=50, null=True)
     privilege = models.CharField(max_length=50, null=True)
-    server_name = models.ForeignKey('Server', on_delete=models.CASCADE)
+    server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
     def __str__(self):
-        return '{}@{}'.format(self.username, self.server_name)
+        return self.username + '@' + self.server_id
 
 class Switch_account(models.Model):
     personnel_id = models.ForeignKey('Personnel',on_delete=models.SET_NULL, null=True)  
     username = models.CharField(max_length=50, null=True)
     privilege = models.CharField(max_length=50, null=True)
-    switch_name = models.ForeignKey('Switch', on_delete=models.CASCADE)
+    switch_id = models.ForeignKey('Switch', on_delete=models.CASCADE)
     password = models.CharField(max_length=50, null=True)
     def __str__(self):
-        return '{}@{}'.format(self.username, self.switch_name)
+        return self.username + '@' + self.switch_id
 
 class Server(models.Model):
-    name = models.CharField(max_length=100)
     slot_num = models.IntegerField(null=True)
     cabinet_num = models.IntegerField(null=True)
     spec = models.CharField(max_length=300, null=True)
-    def __str__(self):
-        return self.name
+    brand_and_model = models.CharField(max_length=100, null=True)
 
 class Service(models.Model):
     name = models.CharField(max_length=50, null=True)
-    server_name = models.ForeignKey('Server', on_delete=models.CASCADE, null=True, blank=True)
-    port = models.IntegerField(null=True)
-    interface_name = models.ForeignKey('Interface', on_delete=models.CASCADE, null=True, blank=True)
-    def __str__(self):
-        return '{}@{}'.format(self.name, self.server_name)
+    server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
+    port_id = models.IntegerField(null=True)
+    interface_id = models.ForeignKey('Interface', on_delete=models.CASCADE)
 
 class Switch(models.Model):
-    name = models.CharField(max_length=100, null=True)
     ip = models.CharField(max_length=20, null=True)
     slot_num = models.IntegerField(null=True)  
+    brand_and_model = models.CharField(max_length=100, null=True)
     cabinet_num = models.IntegerField(null=True)
-    def __str__(self):
-        return self.name
 
 class Interface(models.Model):
-    name = models.CharField(max_length=20, null=True)
     ip = models.CharField(max_length=20, null=True)
     hostname = models.CharField(max_length=100, null=True)
-    server_name = models.ForeignKey('Server', on_delete=models.CASCADE)
-    switch_port = models.ForeignKey('Port', on_delete=models.CASCADE)
-    def __str__(self):
-        return '{}@{}'.format(self.name, self.server_name)
-
+    server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
+    port_id = models.ForeignKey('Port', on_delete=models.CASCADE)
+    service_id = models.ForeignKey('Service', on_delete=models.CASCADE)
 
 class Port(models.Model):
     switch_port_id = models.IntegerField(null=True)
-    switch_name = models.ForeignKey('Switch', on_delete=models.CASCADE)
-    def __str__(self):
-        return '{} port{}'.format(self.switch_name, self.switch_port_id)
+    switch_id = models.ForeignKey('Switch', on_delete=models.CASCADE)
+
+class Access_to_server(models.Model):
+    class Meta:
+        unique_together = (('username', 'server_id'),)
+    username = models.ForeignKey('Server_account', on_delete=models.CASCADE)
+    server_id = models.ForeignKey('Server', on_delete=models.CASCADE)
 
 class Access_to_service(models.Model):
     class Meta:
-        unique_together = (('username', 'service_name'),)
+        unique_together = (('username', 'service_id'),)
     username = models.ForeignKey('Server_account', on_delete=models.CASCADE)
-    service_name = models.ForeignKey('Service', on_delete=models.CASCADE)
+    service_id = models.ForeignKey('Service', on_delete=models.CASCADE)
+
+class Access_to_switch(models.Model):
+    class Meta:
+        unique_together = (('username', 'switch_id'),)
+    username = models.ForeignKey('Switch_account', on_delete=models.CASCADE)
+    switch_id = models.ForeignKey('Switch', on_delete=models.CASCADE)
 
 class Vlan_to_interface(models.Model):
     class Meta:
-        unique_together = (('vlan_id', 'interface_name'),)
+        unique_together = (('vlan_id', 'interface_id'),)
     vlan_id = models.IntegerField(null=True)
-    interface_name = models.ForeignKey('Interface', on_delete=models.CASCADE)
+    interface_id = models.ForeignKey('Interface', on_delete=models.CASCADE)

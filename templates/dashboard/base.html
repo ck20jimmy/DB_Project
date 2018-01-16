@@ -11,7 +11,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.html">DLC_Visualizer</a>
+	    <a class="navbar-brand" href="{% url 'dashboard:index' %}">DLC_Visualizer</a>
         </div>
         <!-- /.navbar-header -->
 
@@ -23,12 +23,7 @@
                     <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                    </li>
-                    <li class="divider"></li>
-                    <li><a href="{% url 'dashboard:login' %}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                    <li><a href="{% url 'dashboard:logout' %}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                     </li>
                 </ul>
                 <!-- /.dropdown-user -->
@@ -40,20 +35,21 @@
         <div class="navbar-default sidebar" role="navigation">
             <div class="sidebar-nav navbar-collapse">
                 <ul class="nav" id="side-menu">
-                        
                     <li>
-                        <a href="{% url 'dashboard:tables' %}"><i class="fa fa-table fa-fw"></i> Tables</a>
+			<a href="{% url 'dashboard:server' %}">Servers</a>
                     </li>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="{% url 'dashboard:blank' %}">Blank Page</a>
-                            </li>
-                            <li>
-                                <a href="#">Login Page</a>
-                            </li>
-                        </ul>
-                        <!-- /.nav-second-level -->
+                    <li>
+                        <a href="{% url 'dashboard:switch' %}">Switches</a>
                     </li>
+		    <li>
+			<a href="{% url 'dashboard:service' %}">Services</a>
+		    </li>
+	 	    <li>
+			<a href="{% url 'dashboard:interface' %}">Interfaces</a>
+		    </li> 
+		    <li>
+			<a href="/admin/">Django admin</a>
+		    </li>
                 </ul>
             </div>
             <!-- /.sidebar-collapse -->

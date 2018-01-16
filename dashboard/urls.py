@@ -1,18 +1,16 @@
 from django.conf.urls import url
+from django.contrib.auth.decorators import login_required, permission_required
+from django.views.generic import TemplateView
 from . import views
+
 
 urlpatterns = [
     url(r'^auth/$', views.LoginView.as_view(), name="login"),
-    url(r'^$', views.IndexView.as_view(), name="index"),
-    url(r'^blank/$', views.BlankView.as_view(), name="blank"),
-    url(r'^buttons/$', views.ButtonsView.as_view(), name="buttons"),
-    url(r'^flot/$', views.FlotView.as_view(), name="flot"),
-    url(r'^forms/$', views.FormsView.as_view(), name="forms"),
-    url(r'^grid/$', views.GridView.as_view(), name="grid"),
-    url(r'^icons/$', views.IconsView.as_view(), name="icons"),
-    url(r'^morris/$', views.MorrisView.as_view(), name="morris"),
-    url(r'^notifications/$', views.NotificationsView.as_view(), name="notifications"),
-    url(r'^panels/$', views.PanelsView.as_view(), name="panels"),
-    url(r'^tables/$', views.TablesView.as_view(), name="tables"),
-    url(r'^typography/$', views.TypographyView.as_view(), name="typography"),
+    url(r'^service/$', login_required(views.ServiceView.as_view(template_name="components/service_tables.html")), name="service"), 
+    url(r'^switch/$', login_required(views.SwitchView.as_view(template_name="components/switch_tables.html")), name="switch"),
+    url(r'^server/$', login_required(views.ServerView.as_view(template_name="components/server_tables.html")), name="server"), 
+    url(r'^interface/$', login_required(views.InterfaceView.as_view(template_name="components/interface_tables.html")), name="interface"),
+    url(r'^$', login_required(views.IndexView.as_view(template_name="components/index.html")), name="index"),
+    url(r'^logout/$', views.LogoutView.as_view(), name="logout"),
 ]
+

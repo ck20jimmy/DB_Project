@@ -1,0 +1,125 @@
+{% extends "dashboard/base.html" %}
+{% load staticfiles %}
+
+{% block extrahead %}
+
+<!-- DataTables CSS -->
+<link href="{% static "bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" %}" rel="stylesheet">
+
+<!-- DataTables Responsive CSS -->
+<link href="{% static "bower_components/datatables-responsive/css/dataTables.responsive.css" %}" rel="stylesheet">
+
+{% endblock extrahead %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Interface Information</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+    
+</div>
+
+<div class="row">
+	<div class="col-lg-6 col-lg-offset-3">
+    	<h3>Interface:</h3>
+    	<select class="form-control" onChange="create_item(this.value)">
+		    <option value='-1'>Choose</option>
+		    {% for ifs_data in ifs_infos %}
+		    	<option value="{{ifs_data.id}}">Interface {{ifs_data.id}}</option>
+		    {% endfor %}
+		</select>
+    </div>
+</div>
+
+<br>
+
+<div class="row item-row">
+    
+</div>
+<!-- /.row -->
+
+
+
+{% endblock content %}
+
+
+{% block extrajs %}
+
+<!-- DataTables JavaScript -->
+<script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+
+<!-- Page-Level Demo Scripts - Tables - Use for reference -->
+<script>
+
+
+function create_item(_id){
+	
+      $('div.ifs-item').remove();
+
+    	let ifs = {{ ifs_infos|safe }} ;
+
+    	let ifs_item = $('<div class="col-lg-6 col-lg-offset-3 ifs-item"></div>');
+    	let panel = $('<div class="panel panel-default"></div>');
+    	let panel_head = $('<div class="panel-heading"></div>');
+    	let panel_body = $('<div class="panel-body"></div>');
+        let vlan_panel_body = $('<div class="panel-body vlan"></div>');
+        
+        let info = {};
+        for (i in ifs){
+        	if(ifs[i]['id'] == _id){
+        		info = ifs[i];
+        		info['ifs'] = JSON.parse(info['ifs'])[0];
+        		info['server'] = JSON.parse(info['server'])[0];
+        		break;
+        	}
+        }
+        
+        console.log(info)
+
+        let sp = $('<span></span>');
+    	sp.append(info['ifs']['fields']['name']+'@');
+        sp.append(info['server']['fields']['name']);
+        panel_head.append(sp);
+
+        panel_body.append('<div class="panel-body info_panel"><div class="table-responsive"><table class="table table-striped table-bordered table-hover"><thead><tr><th>IP</th><th>Hostname</th><th>Port On Switch</th></tr></thead><tbody><tr></tr></tbody></table></div></div>')
+       	panel_body.find("tbody > tr").append('<td>'+info['ifs']['fields']['ip']+'</td>')
+       	panel_body.find("tbody > tr").append('<td>'+info['ifs']['fields']['hostname']+'</td>')
+       	panel_body.find("tbody > tr").append('<td>'+info['port']+'</td>')
+
+       	vlan_panel_body.append('<div class="table-responsive"><table class="table table-striped table-bordered table-hover"><thead><tr><th>Vlan</th></tr></thead><tbody></tbody></table></div>')
+       	for (v in info['vlans']){
+       		let rw = $('<tr></tr>');
+       		let td = $('<td>'+info['vlans'][v]+'</td>')
+       		rw.append(td)
+       		let tbdy = vlan_panel_body.find("tbody")
+       		tbdy.append(rw)
+       	}
+
+       	panel.append(panel_head)
+       	panel.append(panel_body)
+       	panel.append(vlan_panel_body)
+
+       	ifs_item.append(panel)
+       	$('.item-row').append(ifs_item)
+   
+}
+
+console.log("select")
+$("select").change( create_item( $("select").attr('value') ) )
+
+$(document).ready(function() {
+    /*$('#dataTables-example').DataTable({
+            responsive: true
+    });*/
+    
+});
+
+
+
+
+</script>
+
+{% endblock extrajs %}
