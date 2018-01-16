@@ -10,6 +10,11 @@ from django.views.generic import FormView, RedirectView
 from .models import *
 from django.contrib.auth.decorators import login_required
 
+import json
+from django.forms.models import model_to_dict
+from django.core.serializers import serialize
+from django.core.serializers.json import DjangoJSONEncoder
+
 class IndexView(TemplateView):
     template_name = "components/index.html"
     def get_context_data(self, **kwargs):
@@ -198,4 +203,38 @@ class ServerView(TemplateView):
         for i in Server.objects.all():
             interfaces_in_server.append(Interface.objects.filter(server_name__name=i.name))
         context['servers'] = zip(Server.objects.all(), services_in_server, accounts_in_server, interfaces_in_server)
+        return context
+
+
+class InterfaceView(TemplateView):
+    template_name = "components/interface_tables.html"
+ 
+    def get_context_data(self, **kwargs):
+        context = super(InterfaceView, self).get_context_data(**kwargs)
+        context.update({'title': "Interface Tables"})
+        interfaces = Interface.objects.all()
+        ifs_infos = []
+        
+        # jdata = json.dumps(interfaces[0])
+        # jdata = json.dumps({'a':'apple','b':'bird'}).encode('utf-8')
+        # ifs_infos.append(jdata)
+        for ifs in interfaces:
+            s = ifs.server_name
+            port = ifs.switch_port.switch_port_id
+
+            vlans = []
+            v = Vlan_to_interface.objects.filter(interface_name=ifs.id)
+            for vlan in v:
+                vlans.append(vlan.vlan_id)
+
+            info = {
+                'id': ifs.id,
+                'ifs': serialize('json',[ifs],cls=DjangoJSONEncoder),
+                'server':serialize('json',[s],cls=DjangoJSONEncoder),
+                'port':port,
+                'vlans':vlans,
+            }
+            ifs_infos.append(info)
+
+        context['ifs_infos'] = ifs_infos
         return context
