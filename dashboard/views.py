@@ -129,7 +129,7 @@ class SwitchView(TemplateView):
 
     def get_context_data(self,**kwargs):
         context = super(SwitchView, self).get_context_data(**kwargs)
-        context.update({'title': "Switch Tables"})
+        context.update({'title': "Switch Information"})
         context['switch_fields'] = [ f.name for f in Switch._meta.fields]
         switches = Switch.objects.all()
 
@@ -157,7 +157,7 @@ class ServiceView(TemplateView):
 
     def get_context_data(self,**kwargs):
         context = super(ServiceView, self).get_context_data(**kwargs)
-        context.update({'title': "Service Tables"})
+        context.update({'title': "Service Information"})
         context['service_fields'] = [ f.name for f in Service._meta.fields]
         services = Service.objects.all()
 
@@ -170,7 +170,6 @@ class ServiceView(TemplateView):
         context['services_data'] = zip(services,account_on_services)
         print(context)
         return context
-
 
 class InterfaceView(TemplateView):
     template_name = "components/interface_tables.html"
@@ -211,7 +210,7 @@ class InterfaceView(TemplateView):
  
     def get_context_data(self, **kwargs):
         context = super(InterfaceView, self).get_context_data(**kwargs)
-        context.update({'title': "Interface Tables"})
+        context.update({'title': "Interface Information"})
         interfaces = Interface.objects.all()
         ifs_infos = []
         
@@ -237,4 +236,53 @@ class InterfaceView(TemplateView):
             ifs_infos.append(info)
 
         context['ifs_infos'] = ifs_infos
+        return context
+
+class VlanView(TemplateView):
+    template_name = "components/vlan_tables.html"
+    def get_context_data(self, **kwargs):
+        context = super(VlanView, self).get_context_data(**kwargs)
+        context.update({'title': "Vlan Information"})
+        vtoi = Vlan_to_interface.objects.all()
+        vlans = []
+        for i in vtoi:
+            vlan_not_found = 1
+            for j in vlans:
+                if j[0] == i.vlan_id:
+                    j[1].append([str(i.interface_name), str(i.interface_name.switch_port)])
+                    vlan_not_found = 0
+            if vlan_not_found:
+                vlans.append([i.vlan_id,[[str(i.interface_name), str(i.interface_name.switch_port)]]])
+        context['vlans'] = vlans
+        return context
+
+class AccountView(TemplateView):
+    template_name = "components/account_tables.html"
+    def get_context_data(self, **kwargs):
+        context = super(AccountView, self).get_context_data(**kwargs)
+        context.update({'title': "Account Information"})
+        personnels = Personnel.objects.all()
+        per_infos = []
+        for per in personnels:
+            per_info = [per.name]
+            per_server_info = []
+            server_accs = Server_account.objects.filter(personnel=per)
+            for server_acc in server_accs:
+                server_acc_info = [server_acc.username, server_acc.privilege, server_acc.server_name.name]
+                atoss = Access_to_service.objects.filter(username=server_acc)
+                services = []
+                for atos in atoss:
+                    services.append(atos.service_name.name)
+                server_acc_info.append(services)
+                per_server_info.append(server_acc_info)
+            per_info.append(per_server_info)
+            per_switch_info = []
+            switch_accs = Switch_account.objects.filter(personnel=per)
+            for switch_acc in switch_accs:
+                switch_acc_info = [switch_acc.username, switch_acc.privilege, switch_acc.switch_name.name]
+                per_switch_info.append(switch_acc_info)
+            per_info.append(per_switch_info)
+            per_infos.append(per_info)
+        print(per_infos[0][1])
+        context['per_infos'] = per_infos
         return context

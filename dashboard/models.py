@@ -20,7 +20,7 @@ def save_user_profile(sender, instance, **kwargs):
     instance.personnel.save()
 
 class Server_account(models.Model):
-    personnel_id = models.ForeignKey('Personnel', on_delete=models.SET_NULL, null=True)  
+    personnel = models.ForeignKey('Personnel', on_delete=models.SET_NULL, null=True)  
     username = models.CharField(max_length=50, null=True)
     privilege = models.CharField(max_length=50, null=True)
     server_name = models.ForeignKey('Server', on_delete=models.CASCADE)
@@ -29,7 +29,7 @@ class Server_account(models.Model):
         return '{}@{}'.format(self.username, self.server_name)
 
 class Switch_account(models.Model):
-    personnel_id = models.ForeignKey('Personnel',on_delete=models.SET_NULL, null=True)  
+    personnel = models.ForeignKey('Personnel',on_delete=models.SET_NULL, null=True)  
     username = models.CharField(max_length=50, null=True)
     privilege = models.CharField(max_length=50, null=True)
     switch_name = models.ForeignKey('Switch', on_delete=models.CASCADE)
